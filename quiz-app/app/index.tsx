@@ -1,7 +1,9 @@
-import { Text, View, Pressable, Button, StyleSheet,  } from "react-native";
+import { Text, View, Button, StyleSheet } from "react-native";
+import {useEffect, useState} from "react";
 import QuizButton from '../components/QuizButton';
-
 import { FontAwesome } from '@expo/vector-icons';
+import { unlockAsync,addOrientationChangeListener,removeOrientationChangeListener, Orientation } from "expo-screen-orientation";
+import { Link } from 'expo-router';
 
 const questions = [{question: "The capital of New York is New York City.", answer: false}, 
                    {question: "The capital of Illinois is Chicago.", answer: false}, 
@@ -16,34 +18,79 @@ const questions = [{question: "The capital of New York is New York City.", answe
                   ]
 
 export default function Index() {
+
+  const [orientation, setOrientation] = useState(Orientation.PORTRAIT_UP);
+
+  useEffect(() => {
+    console.log("Component mounted");
+    unlockAsync();
+
+    const subscription = addOrientationChangeListener((event) => {
+      console.log(event)
+      console.log("Orientation changed");
+      setOrientation(event.orientationInfo.orientation);
+
+    });
+
+    return () => {
+      console.log("Component unmounted");
+      removeOrientationChangeListener(subscription);
+    };
+  }, []);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const handleNext = () => {
+    setCurrentIndex((currentIndex + 1) % questions.length)
+  }
+
+  const handlePrev = () => {
+    setCurrentIndex((currentIndex - 1 + questions.length) % questions.length)
+  }
+
+  const checkAnswer = (userAnswer: boolean) => {
+    const correctAnswer = questions[currentIndex].answer
+    if (userAnswer === correctAnswer) {
+      alert("You got it right!")
+    } else {
+      alert("I'm sorry, that was incorrect.")
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.questionText}>test question</Text>
+      <Text style={styles.questionText}>
+        {questions[currentIndex].question}
+      </Text>
 
       <View style={[styles.buttonRow, {marginBottom: 40}]}>
-        <QuizButton onPress={() => alert('true pressed')}>
+        <QuizButton onPress={() => checkAnswer(true)}>
           <Text style={styles.buttonText}>TRUE</Text>
         </QuizButton>
-        <QuizButton onPress={() => alert('false pressed')}>
+        <QuizButton onPress={() => checkAnswer(false)}>
           <Text style={styles.buttonText}>FALSE</Text>
         </QuizButton>
       </View>
 
       <View style={styles.buttonRow}>
-        <QuizButton onPress={() => alert('prev clicked')}>
+        <QuizButton onPress={handlePrev}>
           <FontAwesome name="play" size={18} color="white" style={{ transform: [{ rotate: '180deg' }] }}></FontAwesome>
           <Text style={styles.buttonText}>PREV</Text>
         </QuizButton>
 
-        <QuizButton onPress={() => alert('next clicked')}>
+        <QuizButton onPress={handleNext}>
           <Text style={styles.buttonText}>NEXT</Text>
           <FontAwesome name='play' size={18} color='white'></FontAwesome>
         </QuizButton>
       </View>
 
-      <View>
+      <Link href={{
+        pathname: "/cheat",
+        params: { answer: questions[currentIndex].answer.toString()}
+      }} 
+      asChild>
         <Button title="CHEAT" color='red'></Button>
-      </View>
+      </Link>
 
     </View>
 
@@ -56,12 +103,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white'
+    backgroundColor: 'rgb(211, 211, 211)'
   },
 
   questionText: {
     fontSize: 22,
     paddingBottom: 20,
+    textAlign: 'center',
 
   },
   
@@ -73,6 +121,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
-    fontWeight: 800,
+    fontWeight: '800',
 }
 });
