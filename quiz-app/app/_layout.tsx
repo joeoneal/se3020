@@ -8,7 +8,11 @@ export default function RootLayout() {
         options={{
           title: "State Capitol Quiz",
           headerStyle: {backgroundColor: "red"},
-          headerTintColor: "white"
+          headerTintColor: "white",
+          headerTitleStyle: {
+            fontSize: 20,
+            fontWeight: 700,
+          }
         }}
       />
     </Stack>

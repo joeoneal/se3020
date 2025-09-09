@@ -1,4 +1,7 @@
-import { Text, View, Pressable, Button  } from "react-native";
+import { Text, View, Pressable, Button, StyleSheet,  } from "react-native";
+import QuizButton from '../components/QuizButton';
+
+import { FontAwesome } from '@expo/vector-icons';
 
 const questions = [{question: "The capital of New York is New York City.", answer: false}, 
                    {question: "The capital of Illinois is Chicago.", answer: false}, 
@@ -14,55 +17,32 @@ const questions = [{question: "The capital of New York is New York City.", answe
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingBottom: 50
-      }}
-    >
-      <Text
-        style={{fontSize: 22, paddingBottom: 15}}>
-        test question ????
-        
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.questionText}>test question</Text>
 
-      <View style={{flexDirection: "row"}}>
-
-      <Pressable 
-          style={{
-            backgroundColor: "red",
-            borderWidth: 10,
-            borderColor: "red",
-            borderRadius: 3,
-          }} 
-          onPress={() => alert('True has been clicked')}
-          >
-          <Text> True</Text>
-        </Pressable>
-
-        <Pressable 
-          style={{
-            backgroundColor: "red",
-            borderWidth: 10,
-            borderColor: "red",
-            borderRadius: 3,
-          }} 
-          onPress={() => alert('False has been clicked')}
-          >
-          <Text> False</Text>
-        </Pressable>
-
+      <View style={[styles.buttonRow, {marginBottom: 40}]}>
+        <QuizButton onPress={() => alert('true pressed')}>
+          <Text style={styles.buttonText}>TRUE</Text>
+        </QuizButton>
+        <QuizButton onPress={() => alert('false pressed')}>
+          <Text style={styles.buttonText}>FALSE</Text>
+        </QuizButton>
       </View>
 
-      <View style={{flexDirection: "row"}}>
-        <Button title="◀ PREV"/>
-        <Button title="NEXT ▶"/>
+      <View style={styles.buttonRow}>
+        <QuizButton onPress={() => alert('prev clicked')}>
+          <FontAwesome name="play" size={18} color="white" style={{ transform: [{ rotate: '180deg' }] }}></FontAwesome>
+          <Text style={styles.buttonText}>PREV</Text>
+        </QuizButton>
+
+        <QuizButton onPress={() => alert('next clicked')}>
+          <Text style={styles.buttonText}>NEXT</Text>
+          <FontAwesome name='play' size={18} color='white'></FontAwesome>
+        </QuizButton>
       </View>
 
       <View>
-        <Button title="CHEAT"></Button>
+        <Button title="CHEAT" color='red'></Button>
       </View>
 
     </View>
@@ -70,3 +50,29 @@ export default function Index() {
  
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white'
+  },
+
+  questionText: {
+    fontSize: 22,
+    paddingBottom: 20,
+
+  },
+  
+  buttonRow: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+
+  buttonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 800,
+}
+});
