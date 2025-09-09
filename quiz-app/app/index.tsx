@@ -89,7 +89,7 @@ export default function Index() {
         params: { answer: questions[currentIndex].answer.toString()}
       }} 
       asChild>
-        <Button title="CHEAT" color='red'></Button>
+        <Button title="CHEAT" color='red' ></Button>
       </Link>
 
     </View>
