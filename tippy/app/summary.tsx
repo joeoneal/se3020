@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
 
   text2: {
-    fontSize: 24,
+    fontSize: 30,
   },
 
   summary: {
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
 
   bottom_container: {
-    paddingTop: 25,
+    paddingTop: 35,
     flex: 1,
     width: '100%',
     gap: 50,
