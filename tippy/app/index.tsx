@@ -15,6 +15,7 @@ export default function Index() {
 
   const [orientation, setOrientation] = useState(Orientation.PORTRAIT_UP);
   const router = useRouter();
+  const isDisabled = bill.trim() === '' || size.trim() === '';
 
   const handlePress = () => {
     const billAmount = parseFloat(bill) ||0;
@@ -43,6 +44,9 @@ export default function Index() {
       console.log("Orientation changed");
       setOrientation(event.orientationInfo.orientation);
 
+
+
+
     });
 
     return () => {
@@ -52,7 +56,10 @@ export default function Index() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <ScrollView 
+    style={styles.scrollView} // Style for the scroll view itself
+    contentContainerStyle={styles.container} // Your layout styles go here
+  >
 
       <View style={styles.iconContainer}>
         <MaterialCommunityIcons name="calculator-variant" size={100} color="#0db6db" />
@@ -101,20 +108,25 @@ export default function Index() {
       <BigButton
           title="View Summary"
           onPress={handlePress}
+          disabled={isDisabled}
         />
 
       </View>
 
 
-    </View>
+    </ScrollView>
   );
 
 }
 
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
+    backgroundColor: 'white',
+  },
+  
+  container: {
     alignItems: 'center',
     backgroundColor: '#fafbfc',
   },
