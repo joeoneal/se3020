@@ -1,25 +1,21 @@
-import { View, Text, ScrollView, StyleSheet, TextInput, Pressable, Alert } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, TextInput, Pressable, Alert, Image } from 'react-native'
 import { useState, useEffect } from 'react'
 import { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Checkbox from 'expo-checkbox';
 import SaveButton from '@/components/SaveButton';
 import { useCrimes } from "/Users/joeoneal/senior/se3020/se3020/crime-app/contexts/CrimeContext"
-import { useLocalSearchParams } from 'expo-router';
-
-interface Crime {
-    id: string;
-    title: string;
-    description: string;
-    date: Date;
-    isSolved: boolean;
-  }
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker'
+import { MaterialIcons } from '@expo/vector-icons';
 
 
 export default function AddCrimeScreen() {
+    const router = useRouter()
 
     const [title, setTitle] = useState('')
     const [description, setDescription] = useState('')
+    const [imgURL, setImgURL] = useState<string | null>(null)
 
     // date items below //
     const [date, setDate] = useState(new Date())
@@ -36,9 +32,28 @@ export default function AddCrimeScreen() {
 
     const [isSolved, setIsSolved] = useState(false)
 
-    // crim shiz 
+    const pickImage = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (permissionResult.granted === false) {
+            Alert.alert("Permission Required", "You need to allow access to your photos to add an image.");
+            return;
+        }
 
-    const { crimes, addCrime } = useCrimes();
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.5,
+        });
+
+        if (!result.canceled) {
+            setImgURL(result.assets[0].uri);
+        }
+    };
+
+    // crime shiz 
+
+    const { crimes, addCrime, updateCrime } = useCrimes();
     const { id } = useLocalSearchParams<{ id: string }>()
 
     useEffect(() => {
@@ -49,6 +64,7 @@ export default function AddCrimeScreen() {
                 setDescription(existingCrime.description)
                 setDate(existingCrime.date)
                 setIsSolved(existingCrime.isSolved)
+                setImgURL(existingCrime.imgURL || null)
             }
         }
     }, [id, crimes])
@@ -59,19 +75,24 @@ export default function AddCrimeScreen() {
             return;
         }
 
-        addCrime({
+        const crimeData = {
             title: title,
             description: description,
             date: date,
             isSolved: isSolved,
-          });
-        
-        setTitle('');
-        setDescription('');
-        setDate(new Date());
-        setIsSolved(false);
+            imgURL: imgURL || undefined,
+          }
 
-        Alert.alert("Crime Saved", `"${title}" has been added to the list.`);    };
+        if (id) {
+        updateCrime(id, crimeData);
+        Alert.alert("Crime Updated", `"${title}" has been updated.`);
+        } else {
+        addCrime(crimeData);
+        Alert.alert("Crime Saved", `"${title}" has been added to the list.`);
+        }
+
+        router.back()
+    };
     
 
     return(
@@ -79,15 +100,27 @@ export default function AddCrimeScreen() {
             style={styles.scrollView}
             contentContainerStyle={styles.container}
         >
+            <View style={styles.imageAndTitleContainer}>
+                <View style={styles.imgContainer}>
+                {imgURL ? (
+                        <Image source={{ uri: imgURL }} style={styles.imgPreview} />
+                    ) : (
+                        <Pressable onPress={pickImage} style={styles.cameraButton}>
+                            <MaterialIcons name="add-a-photo" size={40} color="#555" />
+                        </Pressable>
+                    )}
+                </View> 
 
-            <View style={styles.titleContainer}>
-                <Text style={styles.title}>Title</Text>
-                <TextInput
-                    style={styles.input}
-                    value={title}
-                    onChangeText={setTitle}
-                    placeholder='Please enter title'
-                />
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Title</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={title}
+                        onChangeText={setTitle}
+                        placeholder='Please enter title'
+                        multiline={true}
+                    />
+                </View>
             </View>
 
             <View style={styles.descriptionContainer}>
@@ -136,7 +169,7 @@ export default function AddCrimeScreen() {
             </View>
 
             {/* save button */}
-            <View style={styles.button}>
+            <View>
                 <SaveButton
                     onPress = {handleSaveCrime}
                 />
@@ -157,15 +190,34 @@ const styles = StyleSheet.create({
     },
 
     titleContainer: {
-        paddingTop: 10,
-        paddingLeft: 150,
         paddingRight: 10,
         gap: 15,
+        width: '69%'
     },
     title: {
         color: 'black',
         fontSize: 34,
         fontWeight: '700',
+    },
+
+    imgContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingLeft: 10
+    },
+
+    imgPreview: {
+        width: 100,
+        height: 100, 
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'white',
+    },
+
+    imageAndTitleContainer :{
+        flexDirection: 'row',
+        gap: 15,
+        paddingTop: 10,
     },
 
     descriptionContainer: {
@@ -225,7 +277,14 @@ const styles = StyleSheet.create({
         height: 120
     },
 
-    button: {
-
+    cameraButton: {
+        width: 100,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
     },
 })

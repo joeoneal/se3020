@@ -6,11 +6,13 @@ interface Crime {
   description: string;
   date: Date;
   isSolved: boolean;
+  imgURL?: string;
 }
 
 interface CrimeContextType {
   crimes: Crime[];
   addCrime: (crime: Omit<Crime, 'id'>) => void;
+  updateCrime: (id: string, updatedData: Omit<Crime, 'id'>) => void;
 }
 
 const CrimeContext = createContext<CrimeContextType | undefined>(undefined);
@@ -24,8 +26,17 @@ export const CrimeProvider = ({ children }: { children: ReactNode }) => {
     setCrimes(prevCrimes => [...prevCrimes, newCrime]);
   };
 
+  const updateCrime = (id: string, updatedData: Omit<Crime, 'id'>) => {
+    setCrimes(prevCrimes =>
+      prevCrimes.map(crime =>
+        crime.id === id ? { ...crime, ...updatedData } : crime
+      )
+    );
+    console.log("Crime updated", )
+  };
+
   return (
-    <CrimeContext.Provider value={{ crimes, addCrime }}>
+    <CrimeContext.Provider value={{ crimes, addCrime, updateCrime }}>
       {children}
     </CrimeContext.Provider>
   );
