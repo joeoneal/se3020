@@ -3,11 +3,33 @@ import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
 import { useCrimes } from "/Users/joeoneal/senior/se3020/se3020/crime-app/contexts/CrimeContext"
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { unlockAsync,addOrientationChangeListener,removeOrientationChangeListener, Orientation } from "expo-screen-orientation";
+import { useState, useEffect } from 'react'
+
 
 
 export default function HomeScreen() {
   const { crimes } = useCrimes();
   const router = useRouter();
+  const [orientation, setOrientation] = useState(Orientation.PORTRAIT_UP);
+
+  useEffect(() => {
+    console.log("Component mounted");
+    unlockAsync();
+
+    const subscription = addOrientationChangeListener((event) => {
+      console.log(event)
+      console.log("Orientation changed");
+      setOrientation(event.orientationInfo.orientation);
+
+
+    });
+
+    return () => {
+      console.log("Component unmounted");
+      removeOrientationChangeListener(subscription);
+    };
+  }, []);
 
 
   return (
