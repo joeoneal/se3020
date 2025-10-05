@@ -8,9 +8,128 @@ import { useCrimes } from "/Users/joeoneal/senior/se3020/se3020/crime-app/contex
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker'
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTheme } from '@/contexts/ThemeContext';
+import { Theme, themes } from '@/constants/Themes';
+
+
+const getStyles = (theme: Theme) => StyleSheet.create({
+    scrollView: {
+        flex: 1,
+        backgroundColor: 'white'
+    },
+    container: {
+
+    },
+
+    titleContainer: {
+        paddingRight: 10,
+        gap: 15,
+        width: '69%'
+    },
+    title: {
+        color: 'black',
+        fontSize: 34,
+        fontWeight: '700',
+    },
+
+    imgContainer: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingLeft: 10
+    },
+
+    imgPreview: {
+        width: 100,
+        height: 100, 
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: 'white',
+    },
+
+    imageAndTitleContainer :{
+        flexDirection: 'row',
+        gap: 15,
+        paddingTop: 10,
+    },
+
+    descriptionContainer: {
+        paddingTop: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        gap: 15,
+    },
+    description: {
+        color: 'black',
+        fontSize: 34,
+        fontWeight: '700',
+
+    },
+
+    dateContainer: {
+        paddingTop: 10,
+        paddingLeft: 10,
+        paddingRight: 10,
+        marginBottom: 20,
+        gap: 15
+    },
+    date: {
+        alignItems: 'center',
+        color: 'black',
+        fontSize: 34,
+        fontWeight: '700',
+    },
+    spinner: {
+        alignItems: 'center'
+    },
+
+    checkBoxContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    checkbox : {
+        marginRight: 8,
+        marginLeft: 10,
+        height: 25,
+        width: 25,
+    },
+    solved: {
+        fontSize: 20,
+    },
+
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        padding: 12,
+        fontSize: 16,
+        backgroundColor: '#f9f9f「9',
+    },
+
+    descriptionInput: {
+        height: 120
+    },
+
+    cameraButton: {
+        width: 100,
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#f0f0f0',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
+    },
+})
+
+
+
 
 
 export default function AddCrimeScreen() {
+    const { contextTheme } = useTheme();
+    const activeTheme = themes[contextTheme as keyof typeof themes] || themes.White;
+    const styles = getStyles(activeTheme);
+
     const router = useRouter()
 
     const [title, setTitle] = useState('')
@@ -172,6 +291,7 @@ export default function AddCrimeScreen() {
             <View>
                 <SaveButton
                     onPress = {handleSaveCrime}
+                    color={activeTheme.colors.primary}
                 />
             </View>
 
@@ -180,111 +300,3 @@ export default function AddCrimeScreen() {
     )
 }
 
-const styles = StyleSheet.create({
-    scrollView: {
-        flex: 1,
-        backgroundColor: 'white'
-    },
-    container: {
-
-    },
-
-    titleContainer: {
-        paddingRight: 10,
-        gap: 15,
-        width: '69%'
-    },
-    title: {
-        color: 'black',
-        fontSize: 34,
-        fontWeight: '700',
-    },
-
-    imgContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingLeft: 10
-    },
-
-    imgPreview: {
-        width: 100,
-        height: 100, 
-        borderRadius: 5,
-        borderWidth: 1,
-        borderColor: 'white',
-    },
-
-    imageAndTitleContainer :{
-        flexDirection: 'row',
-        gap: 15,
-        paddingTop: 10,
-    },
-
-    descriptionContainer: {
-        paddingTop: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
-        gap: 15,
-    },
-    description: {
-        color: 'black',
-        fontSize: 34,
-        fontWeight: '700',
-
-    },
-
-    dateContainer: {
-        paddingTop: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
-        marginBottom: 20,
-        gap: 15
-    },
-    date: {
-        alignItems: 'center',
-        color: 'black',
-        fontSize: 34,
-        fontWeight: '700',
-    },
-    spinner: {
-        alignItems: 'center'
-    },
-
-    checkBoxContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    checkbox : {
-        marginRight: 8,
-        marginLeft: 10,
-        height: 25,
-        width: 25,
-    },
-    solved: {
-        fontSize: 20,
-    },
-
-    input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 12,
-        fontSize: 16,
-        backgroundColor: '#f9f9f「9',
-    },
-
-    descriptionInput: {
-        height: 120
-    },
-
-    cameraButton: {
-        width: 100,
-        height: 100,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#ccc',
-    },
-})

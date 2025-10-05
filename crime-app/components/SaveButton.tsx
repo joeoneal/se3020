@@ -3,11 +3,12 @@ import { Pressable, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 're
 
 type SaveButtonProps = {
     onPress: () => void;
+    color: string;
 }
 
-const SaveButton = ({ onPress}: SaveButtonProps) => {
+const SaveButton = ({ onPress, color}: SaveButtonProps) => {
     return(
-        <Pressable style={styles.button} onPress={onPress}>
+        <Pressable style={[styles.button, { backgroundColor: color }]} onPress={onPress}>
             <Text style={styles.text}>Save</Text>
         </Pressable>
     )
