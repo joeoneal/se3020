@@ -15,43 +15,38 @@ import { Theme, themes } from '@/constants/Themes';
 const getStyles = (theme: Theme) => StyleSheet.create({
     scrollView: {
         flex: 1,
-        backgroundColor: 'white'
+        backgroundColor: theme.colors.background,
     },
     container: {
 
     },
-
     titleContainer: {
         paddingRight: 10,
         gap: 15,
         width: '69%'
     },
     title: {
-        color: 'black',
+        color: theme.colors.text,
         fontSize: 34,
         fontWeight: '700',
     },
-
     imgContainer: {
         alignItems: 'center',
         justifyContent: 'center',
         paddingLeft: 10
     },
-
     imgPreview: {
         width: 100,
         height: 100, 
         borderRadius: 5,
         borderWidth: 1,
-        borderColor: 'white',
+        borderColor: theme.colors.border,
     },
-
     imageAndTitleContainer :{
         flexDirection: 'row',
         gap: 15,
         paddingTop: 10,
     },
-
     descriptionContainer: {
         paddingTop: 10,
         paddingLeft: 10,
@@ -59,12 +54,10 @@ const getStyles = (theme: Theme) => StyleSheet.create({
         gap: 15,
     },
     description: {
-        color: 'black',
+        color: theme.colors.text,
         fontSize: 34,
         fontWeight: '700',
-
     },
-
     dateContainer: {
         paddingTop: 10,
         paddingLeft: 10,
@@ -74,14 +67,13 @@ const getStyles = (theme: Theme) => StyleSheet.create({
     },
     date: {
         alignItems: 'center',
-        color: 'black',
+        color: theme.colors.text,
         fontSize: 34,
         fontWeight: '700',
     },
     spinner: {
         alignItems: 'center'
     },
-
     checkBoxContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -95,29 +87,28 @@ const getStyles = (theme: Theme) => StyleSheet.create({
     },
     solved: {
         fontSize: 20,
+        color: theme.colors.text,
     },
-
     input: {
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: theme.colors.border,
         padding: 12,
         fontSize: 16,
-        backgroundColor: '#f9f9f「9',
+        backgroundColor: theme.colors.card,
+        color: theme.colors.text,
     },
-
     descriptionInput: {
         height: 120
     },
-
     cameraButton: {
         width: 100,
         height: 100,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
+        backgroundColor: theme.colors.card,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#ccc',
+        borderColor: theme.colors.border
     },
 })
 
@@ -237,6 +228,7 @@ export default function AddCrimeScreen() {
                         value={title}
                         onChangeText={setTitle}
                         placeholder='Please enter title'
+                        placeholderTextColor={activeTheme.colors.border} 
                         multiline={true}
                     />
                 </View>
@@ -249,6 +241,7 @@ export default function AddCrimeScreen() {
                     value={description}
                     onChangeText={setDescription}
                     placeholder='What happened?'
+                    placeholderTextColor={activeTheme.colors.border} 
                     multiline={true}
                 />
             </View>
@@ -271,6 +264,7 @@ export default function AddCrimeScreen() {
                     display="spinner"
                     value={date}
                     onChange={onChangeDate}
+                    textColor={activeTheme.colors.text}
                 />
             )}
             </View>

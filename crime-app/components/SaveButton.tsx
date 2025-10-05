@@ -1,5 +1,5 @@
 import React from 'react'
-import { Pressable, Text, StyleSheet, StyleProp, ViewStyle, TextStyle } from 'react-native'
+import { Pressable, Text, StyleSheet } from 'react-native'
 
 type SaveButtonProps = {
     onPress: () => void;

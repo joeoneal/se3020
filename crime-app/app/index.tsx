@@ -31,6 +31,7 @@ const getStyles = (theme: Theme) => StyleSheet.create({
     fontWeight: 'bold',
     color: theme.colors.text,
   },
+
   crimeDate: {
     fontSize: 14,
     color: theme.colors.text,
@@ -82,8 +83,8 @@ export default function HomeScreen() {
           <Pressable onPress={() => router.push({ pathname: '/crimes', params: {id: item.id } })}>
             <View style={styles.crimeItem}>
               <View>
-                <Text style={styles.crimeDate}>{item.title}</Text>
-                <Text>{item.date.toISOString()}</Text>
+                <Text style={styles.crimeTitle}>{item.title}</Text>
+                <Text style={styles.crimeDate}>{item.date.toISOString()}</Text>
               </View>
 
               {item.isSolved && (

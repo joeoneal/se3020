@@ -15,7 +15,8 @@ function AppLayout() {
     <Stack 
       screenOptions={{
         headerStyle: { backgroundColor: activeTheme.colors.primary },
-        headerTintColor: activeTheme.colors.text
+        headerTintColor: contextTheme === 'White' ? '#FFFFFF' : activeTheme.colors.text,
+
       }}
     >
       <Stack.Screen 
