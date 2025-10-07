@@ -1,12 +1,11 @@
-import React from 'react';
-import { View, Text, FlatList, StyleSheet, Pressable } from 'react-native';
-import { useCrimes } from "/Users/joeoneal/senior/se3020/se3020/crime-app/contexts/CrimeContext"
+import { Theme, themes } from '@/constants/Themes';
+import { useCrimes } from "@/contexts/CrimeContext";
+import { useTheme } from '@/contexts/ThemeContext';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { unlockAsync,addOrientationChangeListener,removeOrientationChangeListener, Orientation } from "expo-screen-orientation";
-import { useState, useEffect } from 'react'
-import { useTheme } from '@/contexts/ThemeContext';
-import { Theme, themes } from '@/constants/Themes';
+import { addOrientationChangeListener, Orientation, removeOrientationChangeListener, unlockAsync } from "expo-screen-orientation";
+import React, { useEffect, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 
 
 const getStyles = (theme: Theme) => StyleSheet.create({
