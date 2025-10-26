@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack, router } from "expo-router"; // <-- Import router
 import { TouchableOpacity, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -7,7 +7,7 @@ export default function RootLayout() {
     <Stack
       screenOptions={{
         headerStyle: { backgroundColor: "#0db6db" },
-        headerTintColor: "white",
+        headerTintColor: "#add8e6",
         headerTitleStyle: {
           fontSize: 25,
           fontWeight: '700',
@@ -21,16 +21,26 @@ export default function RootLayout() {
       <Stack.Screen 
         name="(tabs)" 
         options={{
-          // --- ADD THIS LINE ---
-          title: "ZenStep", // This will override the "(tabs)" text
-
+          title: "ZenStep",
           headerRight: () => (
-            <TouchableOpacity onPress={() => Alert.alert("Settings", "Go to settings screen")}>
+            // --- UPDATE THIS OnPress ---
+            <TouchableOpacity onPress={() => router.push('/settings')}>
               <Ionicons name="settings-outline" size={24} color="#add8e6" style={{ marginRight: 15 }} />
             </TouchableOpacity>
           ),
         }} 
       />
+
+      {/* --- ADD THIS NEW SCREEN --- */}
+      {/* This presents the settings screen as a modal */}
+      <Stack.Screen 
+        name="settings" 
+        options={{ 
+          presentation: 'modal',
+          // We can use the global styles, but override title in the file itself
+        }} 
+      />
+
     </Stack>
   );
 }

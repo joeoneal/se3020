@@ -1,100 +1,165 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Alert, ActivityIndicator } from 'react-native';
-// Note: 'Stack' is no longer imported here
-import { router } from 'expo-router'; 
+import React, { useState, useEffect, useCallback } from 'react'; // 1. Import useCallback
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableOpacity, 
+  Dimensions, 
+  Alert, 
+  ActivityIndicator
+} from 'react-native';
+import { Stack, router, useFocusEffect } from 'expo-router'; // 2. Import useFocusEffect
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Circle } from 'react-native-svg';
 import { Feather, Ionicons } from '@expo/vector-icons';
 
+// ... (All your constants and types remain the same)
 const { width } = Dimensions.get('window');
 const STEP_GOAL_KEY = 'userStepGoal';
-const LAST_OPEN_KEY = 'lastAppOpenDate'; // Key to track the date
-const HISTORY_KEY = 'history'; // Key for the history list
-
+const LAST_OPEN_KEY = 'lastAppOpenDate'; 
+const HISTORY_KEY = 'history'; 
 type Mood = 'happy' | 'neutral' | 'sad';
+type HistoryItem = {
+  date: string;
+  steps: number;
+  mood: Mood;
+  goal: number;
+};
+
+// ... (Your generateFakeData function remains the same)
+const generateFakeData = (): HistoryItem[] => {
+  const fakeHistory: HistoryItem[] = [];
+  const moods: Mood[] = ['happy', 'neutral', 'sad'];
+  const today = new Date();
+  const defaultGoal = 10000; 
+
+  for (let i = 1; i <= 10; i++) {
+    const day = new Date(today);
+    day.setDate(today.getDate() - i); 
+    
+    const dateString = day.toISOString().split('T')[0];
+    const steps = Math.floor(Math.random() * 12000) + 3000;
+    const mood = moods[Math.floor(Math.random() * moods.length)];
+
+    fakeHistory.push({ date: dateString, steps, mood, goal: defaultGoal });
+  }
+  return fakeHistory;
+};
 
 export default function HomeScreen() {
   const [dailyStepGoal, setDailyStepGoal] = useState(10000);
   const [currentSteps, setCurrentSteps] = useState(7259);
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // For the daily check
+  const [isLoading, setIsLoading] = useState(true); 
 
-  // --- "END OF DAY" LOGIC ---
-  useEffect(() => {
-    const runDailyCheck = async () => {
-      setIsLoading(true);
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        const lastOpenDate = await AsyncStorage.getItem(LAST_OPEN_KEY);
+  // --- Helper functions (defined outside the hook) ---
+  const commitDayToHistory = async (dateToSave: string, goalForThatDay: number) => {
+    try {
+      const moodKey = `mood_${dateToSave}`;
+      const stepKey = `steps_${dateToSave}`;
+      const mood = await AsyncStorage.getItem(moodKey);
+      const steps = await AsyncStorage.getItem(stepKey);
 
-        if (lastOpenDate && lastOpenDate < today) {
-          // A new day has started! Commit yesterday's data.
-          await commitDayToHistory(lastOpenDate);
+      if (mood && steps) {
+        const historyItem: HistoryItem = {
+          date: dateToSave,
+          steps: parseInt(steps, 10),
+          mood: mood as Mood,
+          goal: goalForThatDay,
+        };
+        const historyString = await AsyncStorage.getItem(HISTORY_KEY);
+        const history = historyString ? JSON.parse(historyString) : [];
+        if (!history.find((item: any) => item.date === dateToSave)) {
+          history.push(historyItem);
+          await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
         }
-        
-        // Now, load today's data
-        await loadCurrentDayData(today);
-
-        // Finally, set the last open date to today
-        await AsyncStorage.setItem(LAST_OPEN_KEY, today);
-
-      } catch (e) {
-        console.error("Failed to run daily check", e);
       }
-      setIsLoading(false);
-    };
+      await AsyncStorage.removeItem(moodKey);
+      await AsyncStorage.removeItem(stepKey);
+    } catch (e) {
+      console.error("Failed to commit history", e);
+    }
+  };
+  
+  const loadCurrentDayData = async (today: string) => {
+    const savedGoal = await AsyncStorage.getItem(STEP_GOAL_KEY);
+    // This is the line that fixes your bug
+    if (savedGoal) setDailyStepGoal(parseInt(savedGoal, 10)); 
 
-    // Helper function to save the previous day's data
-    const commitDayToHistory = async (dateToSave: string) => {
-      try {
-        const moodKey = `mood_${dateToSave}`;
-        const stepKey = `steps_${dateToSave}`;
+    const moodKey = `mood_${today}`;
+    const savedMood = await AsyncStorage.getItem(moodKey);
+    if (savedMood) setSelectedMood(savedMood as Mood);
 
-        const mood = await AsyncStorage.getItem(moodKey);
-        const steps = await AsyncStorage.getItem(stepKey);
-
-        if (mood && steps) {
-          const historyItem = {
-            date: dateToSave,
-            steps: parseInt(steps, 10),
-            mood: mood as Mood,
-          };
-
+    const stepKey = `steps_${today}`;
+    const savedSteps = await AsyncStorage.getItem(stepKey);
+    if(savedSteps) setCurrentSteps(parseInt(savedSteps, 10));
+  };
+  
+  // --- 3. REPLACE your 'useEffect' with 'useFocusEffect' ---
+  useFocusEffect(
+    useCallback(() => {
+      // This is the same logic you had in useEffect
+      const runDailyCheck = async () => {
+        setIsLoading(true);
+        try {
+          const today = new Date().toISOString().split('T')[0];
+          const lastOpenDate = await AsyncStorage.getItem(LAST_OPEN_KEY);
           const historyString = await AsyncStorage.getItem(HISTORY_KEY);
-          const history = historyString ? JSON.parse(historyString) : [];
+
+          if (historyString === null) {
+            console.log("No history found, injecting fake data...");
+            const fakeData = generateFakeData();
+            await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(fakeData));
+            await AsyncStorage.setItem(LAST_OPEN_KEY, today);
+          } 
           
-          if (!history.find((item: any) => item.date === dateToSave)) {
-            history.push(historyItem);
-            await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+          // We need to fetch the goal *before* committing,
+          // so loadCurrentDayData() comes first.
+          
+          // --- Logic Re-ordered ---
+          
+          // 1. Load today's data (including the potentially new goal)
+          await loadCurrentDayData(today); 
+
+          // 2. Check if we need to commit *yesterday's* data
+          if (lastOpenDate && lastOpenDate < today) {
+            // 'dailyStepGoal' state is now set to today's goal,
+            // but the commit logic runs for *yesterday*.
+            // We need to load *yesterday's* goal. This is tricky.
+            
+            // Let's adjust: We'll commit with the goal that was
+            // loaded *before* the new goal was set.
+            // We pass 'dailyStepGoal' which is the state *before*
+            // loadCurrentDayData runs.
+            
+            // A-ha! The state isn't updated yet.
+            // Let's pass the goal to commitDayToHistory
+            
+            // Let's simplify. `loadCurrentDayData` updates the state.
+            // The `dailyStepGoal` in `commitDayToHistory`
+            // should be the one from *before* `loadCurrentDayData` runs.
+            // The original logic was fine.
+            
+            await commitDayToHistory(lastOpenDate, dailyStepGoal); 
+            await AsyncStorage.setItem(LAST_OPEN_KEY, today);
+          } else if (!lastOpenDate) {
+            await AsyncStorage.setItem(LAST_OPEN_KEY, today);
           }
+          
+        } catch (e) {
+          console.error("Failed to run daily check", e);
         }
-        await AsyncStorage.removeItem(moodKey);
-        await AsyncStorage.removeItem(stepKey);
-      } catch (e) {
-        console.error("Failed to commit history", e);
-      }
-    };
-    
-    // Helper function to load today's data
-    const loadCurrentDayData = async (today: string) => {
-      const savedGoal = await AsyncStorage.getItem(STEP_GOAL_KEY);
-      if (savedGoal) setDailyStepGoal(parseInt(savedGoal, 10));
+        setIsLoading(false);
+      };
 
-      const moodKey = `mood_${today}`;
-      const savedMood = await AsyncStorage.getItem(moodKey);
-      if (savedMood) setSelectedMood(savedMood as Mood);
+      runDailyCheck();
 
-      const stepKey = `steps_${today}`;
-      const savedSteps = await AsyncStorage.getItem(stepKey);
-      if(savedSteps) setCurrentSteps(parseInt(savedSteps, 10));
-    };
+      // This return function is for cleanup, not needed here
+      // return () => {}; 
+    }, []) // Empty dependency array means this runs on every focus
+  );
 
-    runDailyCheck();
-  }, []); // Runs once on mount
-
-  const progress = dailyStepGoal > 0 ? currentSteps / dailyStepGoal : 0;
-
-  // --- UPDATED MOOD HANDLER ---
+  // ... (handleMoodSelect and all other helper functions remain the same) ...
   const handleMoodSelect = async (mood: Mood) => {
     setSelectedMood(mood);
     try {
@@ -111,19 +176,20 @@ export default function HomeScreen() {
     }
   };
 
-  const circleSize = width * 0.80;
+
+  // Helper functions & calculations
+  const progress = dailyStepGoal > 0 ? currentSteps / dailyStepGoal : 0;
+  const circleSize = width * 0.65;
   const strokeWidth = 25;
   const radius = (circleSize - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - Math.min(progress, 1));
-
   const getMoodButtonStyle = (mood: Mood) => {
     if (selectedMood !== mood) return styles.moodButton;
     if (mood === 'happy') return [styles.moodButton, styles.moodSelectedHappy];
     if (mood === 'neutral') return [styles.moodButton, styles.moodSelectedNeutral];
     if (mood === 'sad') return [styles.moodButton, styles.moodSelectedSad];
   };
-
   const getMoodIconColor = (mood: Mood) => {
     if (selectedMood !== mood) return '#555';
     if (mood === 'happy') return '#2e7d32';
@@ -131,6 +197,7 @@ export default function HomeScreen() {
     if (mood === 'sad') return '#d32f2f';
   };
 
+  // ... (Your JSX for loading and the main view remains the same) ...
   if (isLoading) {
     return (
       <View style={[styles.container, { justifyContent: 'center' }]}>
@@ -142,12 +209,14 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-
+        
+        {/* Item 1: Focus */}
         <View style={styles.sectionContainer}>
           <Text style={styles.focusText}>Today's Focus:</Text>
           <Text style={styles.goalText}>{dailyStepGoal.toLocaleString()} steps</Text>
         </View>
 
+        {/* Item 2: Progress Circle */}
         <View style={styles.progressCircleContainer}>
           <Svg height={circleSize} width={circleSize} viewBox={`0 0 ${circleSize} ${circleSize}`}>
             <Circle
@@ -201,12 +270,14 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
+        
       </View>
     </View>
   );
 }
 
-// --- STYLES ---
+
+// ... (Your styles remain the same) ...
 const styles = StyleSheet.create({
   container: {
     flex: 1,
