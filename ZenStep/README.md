@@ -1,7 +1,7 @@
-![wireframe1](./assets/images/screenshot.png)
-![wireframe2](./assets/images/screenshot.png)
-![wireframe3](./assets/images/screenshot.png)
-![wireframe4](./assets/images/screenshot.png)
+![wireframe1](./assets/images/pic1.JPG)
+![wireframe2](./assets/images/pic2.JPG)
+![wireframe3](./assets/images/pic3.JPG)
+![wireframe4](./assets/images/pic4.JPG)
 
 ## ZenStep Application
 
