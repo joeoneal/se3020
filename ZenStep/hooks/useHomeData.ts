@@ -4,12 +4,10 @@ import { useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Pedometer } from 'expo-sensors';
 
-// Constants (copied from HomeScreen)
 const STEP_GOAL_KEY = 'userStepGoal';
 const LAST_OPEN_KEY = 'lastAppOpenDate';
 const HISTORY_KEY = 'history';
 
-// Types (copied from HomeScreen)
 export type Mood = 'happy' | 'neutral' | 'sad';
 export type HistoryItem = {
   date: string;
@@ -18,7 +16,6 @@ export type HistoryItem = {
   goal: number;
 };
 
-// Fake Data Generator (copied from HomeScreen)
 const generateFakeData = (): HistoryItem[] => {
   const fakeHistory: HistoryItem[] = [];
   const moods: Mood[] = ['happy', 'neutral', 'sad'];
@@ -36,14 +33,12 @@ const generateFakeData = (): HistoryItem[] => {
   return fakeHistory;
 };
 
-// The Custom Hook
 export default function useHomeData() {
   const [dailyStepGoal, setDailyStepGoal] = useState(10000);
   const [currentSteps, setCurrentSteps] = useState(0);
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // --- Data Handling Logic (moved from HomeScreen) ---
 
   const commitDayToHistory = async (dateToSave: string, goalForThatDay: number) => {
     try {
@@ -66,7 +61,6 @@ export default function useHomeData() {
           await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(history));
         }
       }
-      // Clean up temporary keys
       await AsyncStorage.removeItem(moodKey);
       await AsyncStorage.removeItem(stepKey);
     } catch (e) {
@@ -82,7 +76,7 @@ export default function useHomeData() {
       const moodKey = `mood_${today}`;
       const savedMood = await AsyncStorage.getItem(moodKey);
       if (savedMood) setSelectedMood(savedMood as Mood);
-      else setSelectedMood(null); // Reset if no mood saved for today
+      else setSelectedMood(null); 
 
     } catch (e) {
       console.error("Failed to load current day data", e);
@@ -92,17 +86,15 @@ export default function useHomeData() {
   const getSteps = async () => {
     const isAvailable = await Pedometer.isAvailableAsync();
     if (!isAvailable) {
-      // Consider showing a non-blocking message or disabling step display
       console.warn("Pedometer not available");
-      setCurrentSteps(0); // Default to 0 if unavailable
+      setCurrentSteps(0);
       return;
     }
 
     const { status } = await Pedometer.requestPermissionsAsync();
     if (status !== 'granted') {
-       // Consider showing a non-blocking message
       console.warn("Pedometer permission not granted");
-      setCurrentSteps(0); // Default to 0 if no permission
+      setCurrentSteps(0);
       return;
     }
 
@@ -123,7 +115,6 @@ export default function useHomeData() {
     }
   };
 
-  // Main effect hook (using useFocusEffect)
   useFocusEffect(
     useCallback(() => {
       const runDailyCheck = async () => {
@@ -139,17 +130,13 @@ export default function useHomeData() {
             const fakeData = generateFakeData();
             await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(fakeData));
           }
-          // Commit previous day if new day started
           else if (lastOpenDate && lastOpenDate < today) {
             await commitDayToHistory(lastOpenDate, dailyStepGoal);
           }
 
-          // Load current day's saved data (goal, mood)
           await loadCurrentDayData(today);
-          // Get live step count
           await getSteps();
 
-          // Update last open date
           await AsyncStorage.setItem(LAST_OPEN_KEY, today);
 
         } catch (e) {
@@ -160,37 +147,29 @@ export default function useHomeData() {
       };
 
       runDailyCheck();
-      // Optional: Add cleanup logic if needed when screen loses focus
-      // return () => { console.log("Screen lost focus"); };
-    }, [dailyStepGoal]) // Dependency: Re-run if goal changes
-                      // Note: We deliberately don't depend on steps/mood
-                      // as they change frequently and are fetched live.
+
+    }, [dailyStepGoal])
   );
 
-  // Mood Selection Handler
   const handleMoodSelect = async (mood: Mood) => {
     const today = new Date().toISOString().split('T')[0];
     const moodKey = `mood_${today}`;
     const stepKey = `steps_${today}`;
 
-    // Optimistically update UI
     setSelectedMood(mood);
 
     try {
       await AsyncStorage.setItem(moodKey, mood);
-      // Save the *current* steps from the state when mood is logged
       await AsyncStorage.setItem(stepKey, currentSteps.toString());
 
       Alert.alert("Mood Logged", `You logged: ${mood.charAt(0).toUpperCase() + mood.slice(1)}`);
     } catch (e) {
       console.error("Failed to save mood", e);
-      // Optionally revert UI update or show error
       Alert.alert("Error", "Failed to save mood.");
-      setSelectedMood(null); // Example: Revert selection on error
+      setSelectedMood(null); 
     }
   };
 
-  // Return values needed by the HomeScreen component
   return {
     dailyStepGoal,
     currentSteps,

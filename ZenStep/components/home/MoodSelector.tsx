@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { Mood } from '../../hooks/useHomeData'; // Import Mood type
+import { Mood } from '../../hooks/useHomeData'; 
 
 type MoodSelectorProps = {
   selectedMood: Mood | null;
@@ -13,7 +13,6 @@ export default function MoodSelector({ selectedMood, onSelectMood, isDarkMode }:
   const textStyle = isDarkMode ? styles.darkText : styles.lightText;
   const moodButtonUnselectedStyle = [styles.moodButton, isDarkMode && styles.darkMoodButton];
 
-  // Helper functions moved here
   const getMoodButtonStyle = (mood: Mood) => {
     const baseStyle = moodButtonUnselectedStyle;
     if (selectedMood !== mood) return baseStyle;
@@ -28,7 +27,7 @@ export default function MoodSelector({ selectedMood, onSelectMood, isDarkMode }:
     if (mood === 'happy') return '#2e7d32';
     if (mood === 'neutral') return '#fbc02d';
     if (mood === 'sad') return '#d32f2f';
-    return isDarkMode ? '#999' : '#555'; // Fallback
+    return isDarkMode ? '#999' : '#555';
   };
 
   return (
@@ -62,7 +61,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     alignItems: 'center',
     marginVertical: 20,
-    width: '100%', // Ensure it takes width for centering moodContainer
+    width: '100%', 
   },
   moodLabel: {
     fontSize: 20,
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
   moodContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    width: '80%', // Match original style
+    width: '80%', 
   },
   moodButton: {
     padding: 12,
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
   darkText: {
     color: '#fff',
   },
-  lightMoodButton: { // Example if needed, currently using shared style
+  lightMoodButton: { 
      backgroundColor: '#f0f0f0',
   },
   darkMoodButton: {

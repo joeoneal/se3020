@@ -1,10 +1,8 @@
 import { Stack, router } from "expo-router";
-import { useState, useEffect } from 'react'
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { ThemeProvider, useTheme } from "../contexts/ThemeContext";
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack';
-// 1. Import the StatusBar component
 import { StatusBar } from 'expo-status-bar';
 
 export default function RootLayout() {
@@ -20,7 +18,6 @@ function RootStack() {
   const isDarkMode = contextTheme === 'dark';
 
 
-  // --- Style definitions (no change) ---
   const mainHeaderStyle: NativeStackNavigationOptions = {
     headerStyle: { 
       backgroundColor: isDarkMode ? "#222" : "#0db6db",
@@ -47,9 +44,7 @@ function RootStack() {
 
 
   return (
-    // 2. Wrap your Stack in a Fragment <>
     <>
-      {/* 3. Add the StatusBar component here */}
       <StatusBar style={isDarkMode ? "light" : "dark"} />
       
       <Stack

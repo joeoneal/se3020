@@ -2,28 +2,23 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Define the theme values
 type Theme = 'light' | 'dark';
 const THEME_KEY = 'appTheme';
 
-// Define the shape of the context
 type ThemeContextType = {
   contextTheme: Theme;
   changeTheme: (theme: Theme) => void;
 };
 
-// Create the context with a default value
 const ThemeContext = createContext<ThemeContextType>({
   contextTheme: 'light', // Default
   changeTheme: () => { console.log('change theme not implemented'); }
 });
 
-// Create the provider component
 const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const colorScheme = useColorScheme(); // Gets 'light', 'dark', or 'null' from device
   const [contextTheme, setContextTheme] = useState<Theme>('light'); // Default
 
-  // On initial load, check storage for a saved theme
   useEffect(() => {
     const loadTheme = async () => {
       try {
@@ -31,7 +26,6 @@ const ThemeProvider = ({ children }: { children: ReactNode }) => {
         if (savedTheme) {
           setContextTheme(savedTheme as Theme);
         } else {
-          // If no theme is saved, use the device's default
           setContextTheme(colorScheme || 'light');
         }
       } catch (e) {
@@ -40,9 +34,8 @@ const ThemeProvider = ({ children }: { children: ReactNode }) => {
       }
     };
     loadTheme();
-  }, [colorScheme]); // Re-run if device theme changes
+  }, [colorScheme]); 
 
-  // Function to change and save the theme
   const changeTheme = async (theme: Theme) => {
     try {
       setContextTheme(theme);
@@ -60,7 +53,6 @@ const ThemeProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Create the custom hook
 const useTheme = () => {
   const context = useContext(ThemeContext);
   if (context === undefined) {

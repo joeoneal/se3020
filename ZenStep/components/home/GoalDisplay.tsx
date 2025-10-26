@@ -8,7 +8,7 @@ type GoalDisplayProps = {
 
 export default function GoalDisplay({ goal, isDarkMode }: GoalDisplayProps) {
   const textStyle = isDarkMode ? styles.darkText : styles.lightText;
-  const goalTextStyle = [styles.goalText, isDarkMode ? styles.darkGoalText : styles.lightGoalText]; // Example if goal text needs specific dark style
+  const goalTextStyle = [styles.goalText, isDarkMode ? styles.darkGoalText : styles.lightGoalText]; 
 
   return (
     <View style={styles.sectionContainer}>

@@ -12,7 +12,6 @@ type StepProgressCircleProps = {
 
 export default function StepProgressCircle({ steps, goal, isDarkMode }: StepProgressCircleProps) {
   const progress = goal > 0 ? steps / goal : 0;
-  // Adjusted size to match original styles
   const circleSize = width * 0.65;
   const strokeWidth = 25;
   const radius = (circleSize - strokeWidth) / 2;

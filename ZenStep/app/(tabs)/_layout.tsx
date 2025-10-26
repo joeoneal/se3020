@@ -25,23 +25,19 @@ export default function TabsLayout() {
           backgroundColor: isDarkMode ? '#1c1c1e' : '#f8f8f8',
           borderTopColor: isDarkMode ? '#333' : '#eee',
           
-          // 1. Keep minHeight
           minHeight: 90, 
           
-          // 2. Increase paddingTop slightly
-          paddingTop: 12, // <-- Changed from 10
+          paddingTop: 12, 
           paddingBottom: 10
         },
         
         tabBarLabelStyle: {
           fontSize: 14,
           fontWeight: '600',
-          // 3. Decrease marginTop slightly
-          marginTop: 6, // <-- Changed from 5
+          marginTop: 6, 
         },
         
         tabBarItemStyle: {
-          // No styles needed here
         },
       }}
     >

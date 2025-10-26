@@ -1,10 +1,10 @@
 import React from 'react';
 import { View, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
 import { useTheme } from '../../contexts/ThemeContext';
-import useHomeData, { Mood } from '../../hooks/useHomeData'; // Adjusted path
-import GoalDisplay from '../../components/home/GoalDisplay'; // Adjusted path
-import StepProgressCircle from '../../components/home/StepProgressCircle'; // Adjusted path
-import MoodSelector from '../../components/home/MoodSelector'; // Adjusted path
+import useHomeData, { Mood } from '../../hooks/useHomeData'; 
+import GoalDisplay from '../../components/home/GoalDisplay'; 
+import StepProgressCircle from '../../components/home/StepProgressCircle';
+import MoodSelector from '../../components/home/MoodSelector'; 
 
 export default function HomeScreen() {
   const {
@@ -66,6 +66,6 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     alignItems: 'center',
     paddingVertical: 20,
-    justifyContent: 'space-around', // Keeps spacing similar
+    justifyContent: 'space-around',
   },
 });
