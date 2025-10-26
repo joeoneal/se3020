@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from 'expo-router'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Feather } from '@expo/vector-icons';
+// 1. Import your theme hook
+import { useTheme } from '../../contexts/ThemeContext';
 
 type HistoryItem = {
   date: string;
@@ -13,6 +15,7 @@ type HistoryItem = {
 
 const HISTORY_KEY = 'history';
 
+// MoodIcon component (no changes needed)
 const MoodIcon = ({ mood }: { mood: HistoryItem['mood'] }) => {
   const iconName = mood === 'happy' ? 'smile' : mood === 'neutral' ? 'meh' : 'frown';
   const color = mood === 'happy' ? '#2e7d32' : mood === 'neutral' ? '#fbc02d' : '#d32f2f';
@@ -23,8 +26,12 @@ export default function HistoryScreen() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // 2. Instantiate the theme hook
+  const { contextTheme } = useTheme();
+  const isDarkMode = contextTheme === 'dark';
+
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       const loadHistory = async () => {
         setIsLoading(true);
         try {
@@ -44,17 +51,21 @@ export default function HistoryScreen() {
     }, [])
   );
 
-  // --- Updated renderItem function ---
+  // 3. Update renderItem function to be theme-aware
   const renderItem = ({ item }: { item: HistoryItem }) => {
     const goalReached = item.steps >= item.goal;
 
+    // Apply dynamic styles within the rendered item
     return (
-      <View style={styles.itemContainer}>
+      <View style={[styles.itemContainer, isDarkMode && styles.darkItemContainer]}>
         <View>
-          <Text style={styles.itemDate}>{new Date(item.date).toDateString()}</Text>
+          <Text style={[styles.itemDate, isDarkMode && styles.darkText]}>
+            {new Date(item.date).toDateString()}
+          </Text>
           
-          {/* --- ADDED THIS LINE --- */}
-          <Text style={styles.itemGoal}>Goal: {item.goal.toLocaleString()} steps</Text>
+          <Text style={[styles.itemGoal, isDarkMode && styles.darkMutedText]}>
+            Goal: {item.goal.toLocaleString()} steps
+          </Text>
 
           <View style={styles.stepRow}>
             <Text style={styles.itemSteps}>{item.steps.toLocaleString()} steps</Text>
@@ -68,12 +79,15 @@ export default function HistoryScreen() {
     );
   };
 
+  // 4. Apply dynamic styles to the main view and components
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
       {isLoading ? (
-        <ActivityIndicator size="large" style={styles.loading} />
+        <ActivityIndicator size="large" color="#0db6db" style={styles.loading} />
       ) : history.length === 0 ? (
-        <Text style={styles.emptyText}>No history yet. Start logging!</Text>
+        <Text style={[styles.emptyText, isDarkMode && styles.darkMutedText]}>
+          No history yet. Start logging!
+        </Text>
       ) : (
         <FlatList
           data={history}
@@ -86,11 +100,14 @@ export default function HistoryScreen() {
   );
 }
 
-// --- Updated Styles ---
+// 5. Add dark mode styles to the StyleSheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  darkContainer: {
+    backgroundColor: '#121212',
   },
   listContainer: {
     padding: 20,
@@ -108,22 +125,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 30, // <-- INCREASED padding
+    padding: 30,
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
     marginBottom: 15,
+  },
+  darkItemContainer: {
+    backgroundColor: '#222', // Darker background for list items
   },
   itemDate: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
-  // --- ADDED THIS STYLE ---
+  darkText: {
+    color: '#fff', // White text for dates
+  },
   itemGoal: {
     fontSize: 14,
     color: '#555',
     fontStyle: 'italic',
     marginTop: 8,
+  },
+  darkMutedText: {
+    color: '#999', // Lighter gray for muted text
   },
   stepRow: {
     flexDirection: 'row',
@@ -132,12 +157,12 @@ const styles = StyleSheet.create({
   },
   itemSteps: {
     fontSize: 16,
-    color: '#0db6db',
+    color: '#0db6db', // Keep brand color
     fontWeight: '500',
   },
   goalReachedText: {
     fontSize: 14,
-    color: '#2e7d32',
+    color: '#2e7d32', // Keep success color
     fontWeight: 'bold',
     marginLeft: 10,
     fontStyle: 'italic',

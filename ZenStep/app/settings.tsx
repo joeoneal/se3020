@@ -7,19 +7,21 @@ import {
   TextInput, 
   Keyboard, 
   Alert,
-  Button 
+  Button,
+  TouchableWithoutFeedback // 1. Import TouchableWithoutFeedback
 } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTheme } from '../contexts/ThemeContext'; 
 
 const STEP_GOAL_KEY = 'userStepGoal';
-const THEME_KEY = 'appTheme';
 const HISTORY_KEY = 'history';
 
 export default function SettingsScreen() {
-  const [stepGoal, setStepGoal] =useState(10000);
-  const [selectedTheme, setSelectedTheme] = useState<'light' | 'dark'>('light');
+  const [stepGoal, setStepGoal] = useState(10000);
+  const { contextTheme, changeTheme } = useTheme();
 
+  // ... (All your useEffects and helper functions: loadSettings, saveGoal, handleIncrease, handleDecrease, handleTextChange, handleThemeSelect, handleClearHistory) ...
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -47,7 +49,7 @@ export default function SettingsScreen() {
     }, 500); 
 
     return () => clearTimeout(timerId);
-  }, [stepGoal, selectedTheme]); 
+  }, [stepGoal]);
 
   const handleIncrease = () => {
     setStepGoal(currentGoal => currentGoal + 500);
@@ -66,8 +68,7 @@ export default function SettingsScreen() {
   };
   
   const handleThemeSelect = (theme: 'light' | 'dark') => {
-    setSelectedTheme(theme);
-    Alert.alert("Theme Changed", `Theme set to ${theme}. (Not yet implemented)`);
+    changeTheme(theme);
   };
 
   const handleClearHistory = () => {
@@ -75,10 +76,7 @@ export default function SettingsScreen() {
       "Clear All History",
       "Are you sure? This action cannot be undone and will permanently delete all step and mood history.",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Delete",
           style: "destructive",
@@ -96,82 +94,92 @@ export default function SettingsScreen() {
     );
   };
 
+  // --- Dynamic Styles ---
+  const isDarkMode = contextTheme === 'dark';
+  const containerStyle = [styles.container, isDarkMode && styles.darkContainer];
+  const labelStyle = [styles.label, isDarkMode && styles.darkText];
+  const aboutContainerStyle = [styles.aboutContainer, isDarkMode && styles.darkSecondaryContainer];
+  const aboutTextStyle = [styles.aboutText, isDarkMode && styles.darkText];
+  const stepInputStyle = [styles.stepInput, isDarkMode && styles.darkStepInput];
+  const stepButtonTextStyle = [styles.stepButtonText, isDarkMode && styles.darkStepButtonText];
+  const stepButtonStyle = [styles.stepButton, isDarkMode && styles.darkStepButton];
+
   return (
-    <View style={styles.container}>
-      <Stack.Screen 
-        options={{ 
-          title: "Settings",
-        }} 
-      />
-      
-      {/* Wrapper for top content */}
-      <View>
-        {/* --- Daily Goal Section --- */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Daily Goal</Text>
-          <View style={styles.stepContainer}>
-            <TouchableOpacity style={styles.stepButton} onPress={handleDecrease}>
-              <Text style={styles.stepButtonText}>-</Text>
-            </TouchableOpacity>
-            
-            <TextInput
-              style={styles.stepInput}
-              value={stepGoal.toString()} 
-              onChangeText={handleTextChange}
-              keyboardType="number-pad"
-              selectTextOnFocus
+    // 2. Wrap the main View
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={containerStyle}>
+        <Stack.Screen 
+          options={{ 
+            title: "Settings",
+          }} 
+        />
+        
+        {/* Wrapper for top content */}
+        <View>
+          {/* --- Daily Goal Section --- */}
+          <View style={styles.section}>
+            <Text style={labelStyle}>Daily Goal</Text>
+            <View style={styles.stepContainer}>
+              <TouchableOpacity style={stepButtonStyle} onPress={handleDecrease}>
+                <Text style={stepButtonTextStyle}>-</Text>
+              </TouchableOpacity>
+              <TextInput
+                style={stepInputStyle}
+                value={stepGoal.toString()} 
+                onChangeText={handleTextChange}
+                keyboardType="number-pad"
+                selectTextOnFocus
+              />
+              <TouchableOpacity style={stepButtonStyle} onPress={handleIncrease}>
+                <Text style={stepButtonTextStyle}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* --- Theme Section --- */}
+          <View style={styles.section}>
+            <Text style={labelStyle}>Theme</Text>
+            <View style={styles.themeContainer}>
+              <TouchableOpacity 
+                style={[styles.themeButton, contextTheme === 'light' && styles.themeButtonSelected]} 
+                onPress={() => handleThemeSelect('light')}
+              >
+                <Text style={[styles.themeButtonText, contextTheme === 'light' && styles.themeButtonTextSelected]}>Light</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.themeButton, contextTheme === 'dark' && styles.themeButtonSelected]} 
+                onPress={() => handleThemeSelect('dark')}
+              >
+                <Text style={[styles.themeButtonText, contextTheme === 'dark' && styles.themeButtonTextSelected]}>Dark</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* --- Data Management Section --- */}
+          <View style={styles.section}>
+            <Text style={labelStyle}>Data Management</Text>
+            <Button 
+              title="Clear All History" 
+              onPress={handleClearHistory} 
+              color="#d32f2f" 
             />
-            
-            <TouchableOpacity style={styles.stepButton} onPress={handleIncrease}>
-              <Text style={styles.stepButtonText}>+</Text>
-            </TouchableOpacity>
           </View>
         </View>
-
-        {/* --- Theme Section --- */}
+        
+        {/* --- About Section --- */}
         <View style={styles.section}>
-          <Text style={styles.label}>Theme</Text>
-          <View style={styles.themeContainer}>
-            <TouchableOpacity 
-              style={[styles.themeButton, selectedTheme === 'light' && styles.themeButtonSelected]} 
-              onPress={() => handleThemeSelect('light')}
-            >
-              <Text style={[styles.themeButtonText, selectedTheme === 'light' && styles.themeButtonTextSelected]}>Light</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              style={[styles.themeButton, selectedTheme === 'dark' && styles.themeButtonSelected]} 
-              onPress={() => handleThemeSelect('dark')}
-            >
-              <Text style={[styles.themeButtonText, selectedTheme === 'dark' && styles.themeButtonTextSelected]}>Dark</Text>
-            </TouchableOpacity>
+          <Text style={labelStyle}>About</Text>
+          <View style={aboutContainerStyle}>
+            <Text style={aboutTextStyle}>Copyright 2025</Text>
+            <Text style={aboutTextStyle}>Version 1.0.0</Text>
           </View>
         </View>
-
-        {/* --- Data Management Section --- */}
-        <View style={styles.section}>
-          <Text style={styles.label}>Data Management</Text>
-          <Button 
-            title="Clear All History" 
-            onPress={handleClearHistory} 
-            color="#d32f2f" 
-          />
-        </View>
       </View>
-      
-      {/* --- About Section --- */}
-      <View style={styles.section}>
-        <Text style={styles.label}>About</Text>
-        <View style={styles.aboutContainer}>
-          <Text style={styles.aboutText}>Copyright 2025</Text>
-          <Text style={styles.aboutText}>Version 1.0.0</Text>
-        </View>
-      </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
-// --- Styles ---
+// --- Complete Styles ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -179,14 +187,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     justifyContent: 'space-between',
   },
+  darkContainer: {
+    backgroundColor: '#121212',
+  },
   section: {
-    marginBottom: 40, // <-- INCREASED for more vertical spacing
+    marginBottom: 40,
   },
   label: {
     fontSize: 22,
     fontWeight: 'bold',
     color: '#333',
     marginBottom: 15,
+  },
+  darkText: {
+    color: '#fff',
   },
   stepContainer: {
     flexDirection: 'row',
@@ -202,11 +216,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginHorizontal: 15,
   },
+  darkStepButton: {
+    backgroundColor: '#333',
+  },
   stepButtonText: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#0db6db',
     lineHeight: 30,
+  },
+  darkStepButtonText: {
+    color: '#fff',
   },
   stepInput: {
     borderWidth: 1,
@@ -218,6 +238,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     minWidth: 130,
+    backgroundColor: '#fff',
+    color: '#000',
+  },
+  darkStepInput: {
+    backgroundColor: '#333',
+    borderColor: '#555',
+    color: '#fff',
   },
   themeContainer: {
     flexDirection: 'row',
@@ -249,6 +276,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
     borderRadius: 10,
     padding: 20,
+  },
+  darkSecondaryContainer: {
+    backgroundColor: '#222',
   },
   aboutText: {
     fontSize: 16,
