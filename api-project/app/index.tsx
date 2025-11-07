@@ -3,15 +3,35 @@ import {useState} from 'react'
 import SearchBar from "@/components/home/SearchBar";
 import FilterButton from "@/components/home/FilterButton";
 import SearchButton from "@/components/home/SearchButton";
+import {useRouter} from 'expo-router'
 
 export default function Index() {
+
   const [searchTerm, setSearchTerm] = useState('')
-  const filterPress = () => {
-    console.log('pressed')
-    Alert.alert('pressed the button yo')
+  const [activeFilter, setActiveFilter] = useState('song')
+  const router = useRouter();
+
+  const searchPress = () => {
+    if (!searchTerm.trim()) {
+      return
+    }
+    console.log(searchTerm)
+    router.push({
+      pathname: '/results',
+      params: {
+        term: searchTerm,
+        filter: activeFilter
+      }
+    })
+    
   }
+
+
   return (
     <View style={styles.container}>
+
+
+
       <Text style={styles.searchText}>Music Search</Text>
 
       <SearchBar
@@ -19,22 +39,20 @@ export default function Index() {
         onChangeText={setSearchTerm}
       />
 
-      <FilterButton onPress={filterPress}>
+      <FilterButton onPress={() => setActiveFilter('song')}>
         <Text>Song</Text>
       </FilterButton>
 
-      <FilterButton onPress={filterPress}>
+      <FilterButton onPress={() => setActiveFilter('artist')}>
         <Text>Artist</Text>
       </FilterButton>
 
-      <FilterButton onPress={filterPress}>
+      <FilterButton onPress={() => setActiveFilter('album')}>
         <Text>Album</Text>
       </FilterButton>
 
-      <SearchButton/>
+      <SearchButton onPress={searchPress}/>
       
-
-
 
     </View>
   );

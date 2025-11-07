@@ -1,17 +1,18 @@
-import { Pressable, StyleSheet, StyleProp, ViewStyle, Alert, Text } from 'react-native'
+import { Pressable, StyleSheet, StyleProp, ViewStyle, Text } from 'react-native'
+import {useRouter} from 'expo-router'
 
 type props = {
     style?: StyleProp<ViewStyle>
-    onPress: () => void
 }
 
-export default function SearchButton({ style, onPress }: props) {
+export default function BackButton({style}: props) {
+    const router = useRouter()
     return (
         <Pressable
             style = {[styles.button, style]}
-            onPress={onPress}
+            onPress={() => router.back()}
         >
-            <Text style={styles.text}>Search</Text>
+            <Text style={styles.text}>Back</Text>
         </Pressable>
     )
 }
@@ -29,4 +30,3 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     }
 })
-
