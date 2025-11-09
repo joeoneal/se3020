@@ -1,8 +1,7 @@
 ## Human Interface Guidelines Implementation
 
-One example of how I implemented HIG in my application is through the use of t
-
+One example of how I implemented HIG in my application is through the use of skeleton items on the results and [id] pages. For the [id] pages for example, I have a component that loads a "greyed-out" version of the content that is loading. According to HIG, best practice is to "Show something as soon as possible. If you make people wait for loading to complete before displaying anything, they can interpret the lack of content as a problem with your app or game." I followed this guideline by showing a skeleton of what the content will look like immediately to fill the void for the moment before content is displayed. 
 
 ---
 
-The application also adheres to the principle of **Deference**, ensuring the UI supports the user's primary goal of tracking steps and mood without overshadowing the content. We utilize standard navigation patterns, including a bottom tab bar for primary sections (Today, History) and a modal presentation for the Settings screen, signaling a distinct, temporary task. **Feedback** is provided through visual cues, such as highlighting the selected mood and displaying confirmation alerts for destructive actions like clearing history. Consistent layout structure across the Today and History screens, along with the use of familiar controls, reinforces **Consistency** and predictability, making the app easier to learn and use. 
+A second example is how I implemented filtering of the search field. According to HIG, "To search for content within an app, people generally expect to use a search field. When it makes sense, you can personalize the search experience by using what you know about how people interact with your app ... In some cases, people appreciate the ability to scope a search or filter the results." I did exactly that by creating filter buttons in components/FilterButton.tsx. Then, in index, the search filter is set when the button is clicked and is ready to be passed to the API. 
