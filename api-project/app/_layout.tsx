@@ -1,22 +1,37 @@
 import { Stack } from "expo-router";
 import { StyleSheet, } from 'react-native'
-import  { useRouter } from 'expo-router'
 
 export default function RootLayout() {
-  const router = useRouter()
   return (
     <Stack screenOptions={{
+        headerStyle: { backgroundColor: '#f0f1f2'},
         headerShown: false,
-        contentStyle: styles.global
+        contentStyle: styles.global,
       }}
     >
-      <Stack.Screen name="index"/>
+      <Stack.Screen name="index" options={{title: 'Search'}}/>
+      <Stack.Screen name='results' options=
+        {{
+          headerShown: true, 
+          title: 'Results',
+          headerShadowVisible: false,
+          headerTintColor: 'black'
+        }}
+      />
+      <Stack.Screen name='[id]'
+        options = {{
+          headerShown: true,
+          title: '',
+          headerShadowVisible: false,
+          headerTintColor: 'black'
+        }}
+      />
     </Stack>
   )
 }
 
 const styles = StyleSheet.create({
   global: {
-    backgroundColor: '##e6e5dc'
+    backgroundColor: '#f0f1f2'
   }
 })

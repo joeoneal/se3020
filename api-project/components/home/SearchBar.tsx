@@ -18,10 +18,14 @@ export default function SearchBar({ value, onChangeText}: SearchBarProps) {
 
 const styles = StyleSheet.create({
     search: {
-        height: 50,
-        borderColor: 'black',
-        borderWidth: 1,
-        borderRadius: 8,
-        width: '90%'
+        height: 60, 
+        backgroundColor: '#FFFFFF', 
+        borderWidth: 1.5,
+        borderColor: '#E2E8F0',
+        borderRadius: 14, 
+        width: '100%', 
+        paddingHorizontal: 15,
+        fontSize: 20, 
+        color: '#1C1C1E', 
     }
 })

@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, StyleProp, ViewStyle, Alert, Text } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient';
 
 type props = {
     style?: StyleProp<ViewStyle>
@@ -8,25 +9,31 @@ type props = {
 export default function SearchButton({ style, onPress }: props) {
     return (
         <Pressable
-            style = {[styles.button, style]}
+            style = {[style]}
             onPress={onPress}
         >
-            <Text style={styles.text}>Search</Text>
+            <LinearGradient
+                colors={['#AECFFF', '#007AFF']}
+                style={styles.button} 
+            >
+                <Text style={styles.text}>Search</Text>
+            </LinearGradient>
         </Pressable>
     )
 }
 
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: '#E53E3E', 
-        paddingVertical: 12,
+        backgroundColor: 'rgba(52, 120, 246, 0.8)', 
+        paddingVertical: 20, 
         paddingHorizontal: 20,
-        borderRadius: 8,
+        borderRadius: 14, 
         alignItems: 'center',
     },
     text: {
         color: 'white',
         fontWeight: 'bold',
+        fontSize: 50, 
     }
 })
 

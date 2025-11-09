@@ -1,30 +1,41 @@
-import { View, StyleSheet, Text } from 'react-native'
-import BackButton from '@/components/results/BackButton'
+import { View, StyleSheet, Text, FlatList, ActivityIndicator, Image, Pressable, } from 'react-native'
+import useMusicData from '@/hooks/useMusicData'
+import { SkeletonItem, MusicListItem } from '@/components/results/MusicListItem'
+
+
+// https://itunes.apple.com/search
 
 export default function Results() {
+    const  { data } = useMusicData()
+    const renderItem = ({ item }) => (
+        <MusicListItem item={item} />
+    )
     return (
         <View style={styles.container}>
-            <Text style={styles.text}>text here</Text>
-            <BackButton style={styles.button}></BackButton>
+            {/* {!data && (<ActivityIndicator size="large" color="#0000ff" />)} */}
+            {!data && (
+                <View style= {styles.container}>
+                    <SkeletonItem/><SkeletonItem/><SkeletonItem/><SkeletonItem/><SkeletonItem/><SkeletonItem/><SkeletonItem/><SkeletonItem/><SkeletonItem/>
+                </View>
+            )}
+            {data && (
+                <FlatList
+                    data={data.results}
+                    renderItem={renderItem}
+                    keyExtractor={(item, index) => {
+                        const id = item.trackId || item.collectionId || item.artistId;
+                        return id ? id.toString() : index.toString(); 
+                    }}
+                    style={styles.list}
+                />
+            )}
         </View>
     )
-}
+} 
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        paddingTop: 7, // No longer needed with header
     },
-
-    text: {
-        fontSize: 34,
-        color: 'red',
-        fontWeight: 'bold'
-
-    },
-
-    button: {
-
-    }
 })
